@@ -1,0 +1,649 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f8fc;
+  color: #263238;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+.app-layout {
+  min-height: 100vh;
+}
+
+.dashboard-layout {
+  display: flex;
+  min-height: calc(100vh - 65px);
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 30px;
+  min-width: 0;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.dashboard-content h1 {
+  margin-bottom: 10px;
+}
+
+.dashboard-content p {
+  color: #667085;
+  line-height: 1.6;
+}
+
+.primary-btn {
+  display: inline-block;
+  background: #2878d0;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+}
+
+.primary-btn:hover {
+  background: #185da9;
+}
+
+.trip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 35px;
+  border-radius: 14px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+}
+
+.auth-form h1,
+.auth-form p {
+  margin-bottom: 18px;
+}
+
+.auth-form input,
+.auth-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #d6dce5;
+  border-radius: 7px;
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 13px;
+  background: #2878d0;
+  color: white;
+  border-radius: 7px;
+  margin-bottom: 15px;
+}
+
+.error-message {
+  color: #d93025 !important;
+  margin: 10px 0;
+}
+
+.booking-list,
+.journal-list {
+  display: grid;
+  gap: 18px;
+}
+
+.shared-trip-page {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .dashboard-content {
+    padding: 18px;
+  }
+
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .auth-form {
+    padding: 25px;
+  }
+}
+
+
+/* NAVBAR */
+.navbar {
+  height: 65px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 35px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  position: relative;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: bold;
+  color: #2878d0;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-right button {
+  background: #2878d0;
+  color: white;
+  padding: 9px 16px;
+  border-radius: 7px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #ffffff;
+  padding: 25px 15px;
+  border-right: 1px solid #e8edf3;
+}
+
+.sidebar h3 {
+  margin: 0 0 20px 12px;
+  color: #667085;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px 15px;
+  margin-bottom: 7px;
+  border-radius: 8px;
+  color: #475467;
+  transition: 0.2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background: #eaf3ff;
+  color: #2878d0;
+}
+
+/* DASHBOARD */
+.dashboard-content {
+  background: #f7f9fc;
+}
+
+.dashboard-content h1 {
+  font-size: 30px;
+  color: #1d2939;
+}
+
+.dashboard-header p {
+  margin-top: 5px;
+}
+
+/* TRIP CARD */
+.trip-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px;
+  border: 1px solid #e9edf3;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+  transition: 0.2s;
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+}
+
+.trip-card h3 {
+  font-size: 19px;
+  margin-bottom: 12px;
+  color: #1d2939;
+}
+
+.trip-card p {
+  margin: 8px 0;
+  color: #667085;
+}
+
+.trip-card a {
+  color: #2878d0;
+  font-weight: 600;
+  margin-right: 15px;
+}
+
+.trip-card button {
+  background: #fff0f0;
+  color: #d93025;
+  padding: 8px 12px;
+  border-radius: 7px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e8edf3;
+  }
+
+  .navbar {
+    padding: 0 16px;
+  }
+}
+.trip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 350px));
+  gap: 22px;
+  align-items: start;
+}
+
+
+/* CREATE TRIP FORM */
+
+.trip-form {
+  max-width: 750px;
+  margin: 25px auto;
+  padding: 30px;
+  background: #ffffff;
+  border: 1px solid #e9edf3;
+  border-radius: 14px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.trip-form h2 {
+  font-size: 24px;
+  color: #1d2939;
+  margin-bottom: 25px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #344054;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d6dce5;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #263238;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #2878d0;
+  box-shadow: 0 0 0 3px rgba(40, 120, 208, 0.1);
+}
+
+.form-group textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.trip-form .primary-btn {
+  width: 100%;
+  font-weight: 600;
+  font-size: 15px;
+  margin-top: 5px;
+}
+
+@media (max-width: 600px) {
+  .trip-form {
+    padding: 20px;
+    margin: 15px 0;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+/* TRIP DETAILS PAGE */
+
+.trip-details-page {
+  padding: 30px;
+  background: #f7f9fc;
+}
+
+/* TRIP HERO */
+
+.trip-hero {
+  background: linear-gradient(120deg, #e8f2ff, #ffffff);
+  padding: 35px;
+  border-radius: 16px;
+  border: 1px solid #e1ebf8;
+  margin-bottom: 25px;
+}
+
+.trip-label {
+  color: #2878d0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.trip-hero h1 {
+  font-size: 32px;
+  margin: 10px 0 15px;
+  color: #1d2939;
+}
+
+.trip-hero .trip-destinations,
+.trip-hero .trip-dates {
+  margin-top: 10px;
+  color: #526174;
+  font-size: 15px;
+}
+
+/* OVERVIEW CARDS */
+
+.trip-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.overview-card {
+  background: white;
+  padding: 22px;
+  border: 1px solid #e9edf3;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.overview-card > span {
+  font-size: 28px;
+}
+
+.overview-card h3 {
+  font-size: 24px;
+  color: #2878d0;
+  margin-bottom: 5px;
+}
+
+.overview-card p {
+  font-size: 14px;
+  color: #667085;
+}
+
+/* PAGE SECTIONS */
+
+.trip-section {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  border: 1px solid #e9edf3;
+  margin-bottom: 25px;
+}
+
+.section-heading {
+  margin-bottom: 22px;
+}
+
+.section-heading h2 {
+  color: #1d2939;
+  font-size: 23px;
+  margin-bottom: 7px;
+}
+
+.section-heading p {
+  color: #667085;
+  font-size: 14px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .trip-overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .trip-details-page {
+    padding: 18px;
+  }
+
+  .trip-hero {
+    padding: 22px;
+  }
+
+  .trip-hero h1 {
+    font-size: 25px;
+  }
+
+  .trip-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trip-section {
+    padding: 18px;
+  }
+}
+
+/* WEATHER CARD */
+.weather-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 14px;
+  border: 1px solid #e5eaf1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.weather-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 22px;
+  color: #2878d0;
+}
+
+.weather-header h3 {
+  color: #1d2939;
+  margin-bottom: 5px;
+}
+
+.weather-header p {
+  color: #667085;
+}
+
+.weather-card button {
+  background: #2878d0;
+  color: white;
+  padding: 11px 20px;
+  border-radius: 7px;
+  margin-bottom: 20px;
+}
+
+.weather-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.weather-forecast {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.weather-day {
+  background: #f3f7fd;
+  padding: 18px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.weather-day h4 {
+  margin-bottom: 15px;
+}
+
+.weather-day svg {
+  color: #2878d0;
+  margin-bottom: 10px;
+}
+
+.weather-day p {
+  margin: 7px 0;
+}
+
+.weather-day small {
+  display: block;
+  margin-top: 12px;
+  color: #2878d0;
+  line-height: 1.5;
+}
+
+/* TRAVEL TIMELINE */
+.timeline {
+  position: relative;
+  padding: 10px 0 10px 25px;
+}
+
+.timeline-day {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e5eaf1;
+  border-radius: 13px;
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.timeline-day h3 {
+  color: #2878d0;
+  margin-bottom: 20px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 15px;
+  margin-bottom: 12px;
+  background: #f5f8fc;
+  border-radius: 10px;
+  border-left: 4px solid #2878d0;
+}
+
+.timeline-item svg {
+  color: #2878d0;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.timeline-item h4 {
+  margin-bottom: 6px;
+  color: #263238;
+}
+
+.timeline-item p,
+.timeline-item small {
+  color: #667085;
+  line-height: 1.6;
+}
+
+.timeline-item img {
+  display: block;
+  max-width: 180px;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .weather-forecast {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .timeline {
+    padding-left: 8px;
+  }
+
+  .timeline-day {
+    padding: 15px;
+  }
+}
