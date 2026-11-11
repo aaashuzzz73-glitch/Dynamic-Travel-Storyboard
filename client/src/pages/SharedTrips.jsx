@@ -26,12 +26,19 @@ const SharedTrip = () => {
 
         const data = response.data;
 
+        // Debugging: Check complete shared trip response
+        console.log(
+          "FULL SHARED DATA:",
+          JSON.stringify(data, null, 2)
+        );
+
         setTrip(data.trip);
         setBookings(data.bookings || []);
         setActivities(data.activities || []);
         setNotes(data.notes || []);
         setMedia(data.media || []);
       } catch (err) {
+        console.error("Shared trip error:", err.response?.data || err);
         setError("This shared travel story is unavailable.");
       } finally {
         setLoading(false);

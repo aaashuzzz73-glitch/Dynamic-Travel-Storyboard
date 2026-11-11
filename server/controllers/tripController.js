@@ -1,4 +1,7 @@
-
+const Booking = require("../models/Booking");
+const Activity = require("../models/Activity");
+const Note = require("../models/Note");
+const Media = require("../models/Media");
 const Trip = require("../models/Trip");
 const crypto = require("crypto");
 
@@ -124,7 +127,7 @@ exports.setSharing = async (req, res) => {
   }
 };
 
-// Get Shared Trip
+// Get Complete Shared Trip
 exports.getSharedTrip = async (req, res) => {
   try {
     const trip = await Trip.findOne({
@@ -138,8 +141,24 @@ exports.getSharedTrip = async (req, res) => {
       });
     }
 
-    res.status(200).json({ trip });
+    const [bookings, activities, notes, media] = await Promise.all([
+      Booking.find({ trip: trip._id }).sort({ bookingDate: 1 }),
+      Activity.find({ trip: trip._id }).sort({ date: 1 }),
+      Note.find({ trip: trip._id }).sort({ date: 1 }),
+      Media.find({ trip: trip._id }).sort({ createdAt: 1 })
+    ]);
+
+    res.status(200).json({
+      trip,
+      bookings,
+      activities,
+      notes,
+      media
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message
+    });
   }
 };

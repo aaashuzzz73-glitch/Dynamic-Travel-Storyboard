@@ -1,4 +1,11 @@
-import { BookOpen, CalendarDays, Trash2 } from "lucide-react";
+
+import {
+  BookOpen,
+  CalendarDays,
+  Trash2,
+  Pencil,
+} from "lucide-react";
+
 import { formatDate } from "../utils/dateUtils";
 
 const JournalCard = ({ note, onDelete, onEdit }) => {
@@ -15,16 +22,24 @@ const JournalCard = ({ note, onDelete, onEdit }) => {
         </span>
 
         <h3>{note.title}</h3>
-
         <p>{note.content}</p>
       </div>
 
       <div className="journal-actions">
-        <button onClick={() => onEdit(note)}>
+        <button
+          type="button"
+          className="journal-edit-btn"
+          onClick={() => onEdit(note)}
+        >
+          <Pencil size={15} />
           Edit
         </button>
 
-        <button onClick={() => onDelete(note._id)}>
+        <button
+          type="button"
+          className="journal-delete-action"
+          onClick={onDelete}
+        >
           <Trash2 size={15} />
           Delete
         </button>

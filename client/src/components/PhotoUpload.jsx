@@ -1,5 +1,7 @@
+
 import { useState } from "react";
 import { uploadMedia } from "../services/mediaService";
+import { Camera, CalendarDays, MapPin, Upload } from "lucide-react";
 
 const PhotoUpload = ({ tripId, activities = [], onUpload }) => {
   const [file, setFile] = useState(null);
@@ -33,7 +35,6 @@ const PhotoUpload = ({ tripId, activities = [], onUpload }) => {
       setFile(null);
       setDate("");
       setActivity("");
-
       e.target.reset();
       onUpload?.();
     } catch (err) {
@@ -45,43 +46,63 @@ const PhotoUpload = ({ tripId, activities = [], onUpload }) => {
 
   return (
     <form onSubmit={handleUpload} className="photo-upload">
-      <h3>Upload Travel Photo</h3>
+      <div className="photo-upload-heading">
+        <Camera size={22} />
+        <h3>Upload Travel Photo</h3>
+      </div>
 
-      <label>Choose Photo</label>
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        onChange={(e) => setFile(e.target.files[0])}
-        required
-      />
+      <div className="photo-upload-grid">
+        <div className="photo-field">
+          <label>Choose Photo</label>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={(e) => setFile(e.target.files[0])}
+            required
+          />
+          {file && <small>{file.name}</small>}
+        </div>
 
-      <label>Travel Date</label>
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        required
-      />
+        <div className="photo-field">
+          <label>
+            <CalendarDays size={15} /> Travel Date
+          </label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </div>
 
-      <label>Related Activity</label>
-      <select
-        value={activity}
-        onChange={(e) => setActivity(e.target.value)}
-      >
-        <option value="">No specific activity</option>
+        <div className="photo-field">
+          <label>
+            <MapPin size={15} /> Related Activity
+          </label>
+          <select
+            value={activity}
+            onChange={(e) => setActivity(e.target.value)}
+          >
+            <option value="">No specific activity</option>
+            {activities.map((item) => (
+              <option key={item._id} value={item._id}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {activities.map((item) => (
-          <option key={item._id} value={item._id}>
-            {item.title}
-          </option>
-        ))}
-      </select>
+        <button
+          type="submit"
+          className="photo-upload-btn"
+          disabled={loading}
+        >
+          <Upload size={17} />
+          {loading ? "Uploading..." : "Upload Photo"}
+        </button>
+      </div>
 
       {error && <p className="error">{error}</p>}
-
-      <button type="submit" disabled={loading}>
-        {loading ? "Uploading..." : "Upload Photo"}
-      </button>
     </form>
   );
 };

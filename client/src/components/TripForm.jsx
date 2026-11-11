@@ -1,9 +1,12 @@
+
 import { useState } from "react";
+import { MapPin, CalendarDays, FileText, Plane } from "lucide-react";
 
 const TripForm = ({
   onSubmit,
   initialData = {},
   buttonText = "Create Trip",
+  loading = false,
 }) => {
   const [formData, setFormData] = useState({
     tripName: initialData.tripName || "",
@@ -33,34 +36,40 @@ const TripForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="trip-form">
-      <h2>{buttonText}</h2>
+    <form onSubmit={handleSubmit} className="trip-form premium-trip-form">
 
       <div className="form-group">
-        <label>Trip Name</label>
+        <label>
+          <Plane size={16} /> Trip Name
+        </label>
         <input
           name="tripName"
           value={formData.tripName}
           onChange={handleChange}
-          placeholder="Enter trip name"
+          placeholder="Eg: My Kerala Vacation"
           required
         />
       </div>
 
       <div className="form-group">
-        <label>Destinations</label>
+        <label>
+          <MapPin size={16} /> Destinations
+        </label>
         <input
           name="destinations"
           value={formData.destinations}
           onChange={handleChange}
-          placeholder="Munnar, Alleppey"
+          placeholder="Munnar, Alleppey, Wayanad"
           required
         />
+        <small>Separate multiple destinations using commas.</small>
       </div>
 
       <div className="form-row">
         <div className="form-group">
-          <label>Start Date</label>
+          <label>
+            <CalendarDays size={16} /> Start Date
+          </label>
           <input
             type="date"
             name="startDate"
@@ -71,7 +80,9 @@ const TripForm = ({
         </div>
 
         <div className="form-group">
-          <label>End Date</label>
+          <label>
+            <CalendarDays size={16} /> End Date
+          </label>
           <input
             type="date"
             name="endDate"
@@ -84,17 +95,24 @@ const TripForm = ({
       </div>
 
       <div className="form-group">
-        <label>Description</label>
+        <label>
+          <FileText size={16} /> Trip Description
+        </label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
-          placeholder="Describe your trip..."
+          placeholder="What are you planning for this journey?"
+          rows={4}
         />
       </div>
 
-      <button type="submit" className="primary-btn">
-        {buttonText}
+      <button
+        type="submit"
+        className="travel-create-btn"
+        disabled={loading}
+      >
+        {loading ? "Creating your trip..." : `✈ ${buttonText}`}
       </button>
     </form>
   );

@@ -1,8 +1,12 @@
+
 import api from "./api";
 
 // Get all trips
 export const getAllTrips = async () => {
   const response = await api.get("/trips");
+
+  console.log("TRIP API RESPONSE:", response.data);
+
   return response.data;
 };
 

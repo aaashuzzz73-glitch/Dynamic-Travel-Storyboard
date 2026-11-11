@@ -6,7 +6,7 @@ import {
   getBookings,
   createBooking,
   deleteBooking,
-} from "../services/bookingService";
+} from "../services/bookingservice";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -115,7 +115,7 @@ const Bookings = () => {
   };
 
   return (
-    <div className="app-layout">
+  <div className="app-layout travel-dashboard">
       <Navbar />
 
       <div className="dashboard-layout">
@@ -125,10 +125,9 @@ const Bookings = () => {
           <h1>My Bookings</h1>
           <p>Manage all your travel reservations in one place.</p>
 
-          <section className="trip-section">
+<section className="details-section">
             <h2>Add New Booking</h2>
-
-            <form className="trip-form" onSubmit={handleSubmit}>
+<form className="premium-trip-form booking-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>Select Trip</label>
                 <select
@@ -231,7 +230,7 @@ const Bookings = () => {
 
           {error && <p className="error-message">{error}</p>}
 
-          <section className="trip-section">
+        <section className="details-section">
             <h2>My Reservations</h2>
 
             {loading ? (
