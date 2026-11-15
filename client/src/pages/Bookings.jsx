@@ -6,11 +6,23 @@ import {
   getBookings,
   createBooking,
   deleteBooking,
+  updateBooking,
 } from "../services/bookingservice";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import BookingCard from "../components/BookingCard";
+
+const initialForm = {
+  tripId: "",
+  bookingType: "Flight",
+  title: "",
+  bookingDate: "",
+  bookingTime: "",
+  location: "",
+  bookingReference: "",
+  notes: "",
+};
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -18,17 +30,9 @@ const Bookings = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editingBooking, setEditingBooking] = useState(null);
 
-  const [form, setForm] = useState({
-    tripId: "",
-    bookingType: "Flight",
-    title: "",
-    bookingDate: "",
-    bookingTime: "",
-    location: "",
-    bookingReference: "",
-    notes: "",
-  });
+  const [form, setForm] = useState(initialForm);
 
   const fetchBookings = async () => {
     try {
@@ -63,9 +67,41 @@ const Bookings = () => {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
+  // EDIT BOOKING
+  const handleEdit = (booking) => {
+    setEditingBooking(booking);
+
+    setForm({
+      tripId: booking.tripId,
+      bookingType: booking.bookingType || "Flight",
+      title: booking.title || "",
+      bookingDate: booking.bookingDate
+        ? String(booking.bookingDate).slice(0, 10)
+        : "",
+      bookingTime: booking.bookingTime || "",
+      location: booking.location || "",
+      bookingReference: booking.bookingReference || "",
+      notes: booking.notes || "",
+    });
+
+    setError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // CANCEL EDIT
+  const handleCancelEdit = () => {
+    setEditingBooking(null);
+    setForm(initialForm);
+    setError("");
+  };
+
+  // ADD / UPDATE BOOKING
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -80,42 +116,58 @@ const Bookings = () => {
 
       const { tripId, ...bookingData } = form;
 
-      await createBooking(tripId, bookingData);
+      if (editingBooking) {
+        await updateBooking(
+          tripId,
+          editingBooking._id,
+          bookingData
+        );
+      } else {
+        await createBooking(tripId, bookingData);
+      }
 
-      setForm({
-        tripId: "",
-        bookingType: "Flight",
-        title: "",
-        bookingDate: "",
-        bookingTime: "",
-        location: "",
-        bookingReference: "",
-        notes: "",
-      });
+      setEditingBooking(null);
+      setForm(initialForm);
 
       await fetchBookings();
     } catch (err) {
-      setError("Unable to add booking. Please try again.");
+      console.error(err);
+      setError(
+        editingBooking
+          ? "Unable to update booking. Please try again."
+          : "Unable to add booking. Please try again."
+      );
     } finally {
       setSaving(false);
     }
   };
 
+  // DELETE BOOKING
   const handleDelete = async (booking) => {
-    if (!window.confirm("Delete this booking?")) return;
+    if (!window.confirm("Are you sure you want to delete this booking?")) {
+      return;
+    }
 
     try {
+      setError("");
+
       await deleteBooking(booking.tripId, booking._id);
+
       setBookings((prev) =>
         prev.filter((item) => item._id !== booking._id)
       );
+
+      if (editingBooking?._id === booking._id) {
+        handleCancelEdit();
+      }
     } catch (err) {
+      console.error(err);
       setError("Unable to delete booking.");
     }
   };
 
   return (
-  <div className="app-layout travel-dashboard">
+    <div className="app-layout travel-dashboard">
       <Navbar />
 
       <div className="dashboard-layout">
@@ -125,9 +177,15 @@ const Bookings = () => {
           <h1>My Bookings</h1>
           <p>Manage all your travel reservations in one place.</p>
 
-<section className="details-section">
-            <h2>Add New Booking</h2>
-<form className="premium-trip-form booking-form" onSubmit={handleSubmit}>
+          <section className="details-section">
+            <h2>
+              {editingBooking ? "Edit Booking" : "Add New Booking"}
+            </h2>
+
+            <form
+              className="premium-trip-form booking-form"
+              onSubmit={handleSubmit}
+            >
               <div className="form-group">
                 <label>Select Trip</label>
                 <select
@@ -137,6 +195,7 @@ const Bookings = () => {
                   required
                 >
                   <option value="">Choose a trip</option>
+
                   {trips.map((trip) => (
                     <option key={trip._id} value={trip._id}>
                       {trip.tripName}
@@ -223,14 +282,30 @@ const Bookings = () => {
               </div>
 
               <button type="submit" disabled={saving}>
-                {saving ? "Adding..." : "Add Booking"}
+                {saving
+                  ? "Please wait..."
+                  : editingBooking
+                  ? "Update Booking"
+                  : "Add Booking"}
               </button>
+
+              {editingBooking && (
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={handleCancelEdit}
+                >
+                  Cancel Edit
+                </button>
+              )}
             </form>
           </section>
 
-          {error && <p className="error-message">{error}</p>}
+          {error && (
+            <p className="error-message">{error}</p>
+          )}
 
-        <section className="details-section">
+          <section className="details-section">
             <h2>My Reservations</h2>
 
             {loading ? (
@@ -245,14 +320,12 @@ const Bookings = () => {
                 {bookings.map((booking) => (
                   <div key={booking._id}>
                     <p>Trip: {booking.tripName}</p>
-                    <BookingCard booking={booking} />
 
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(booking)}
-                    >
-                      Delete
-                    </button>
+                    <BookingCard
+                      booking={booking}
+                      onEdit={handleEdit}
+                      onDelete={() => handleDelete(booking)}
+                    />
                   </div>
                 ))}
               </div>

@@ -16,13 +16,13 @@ const Navbar = () => {
     <nav className="navbar premium-navbar">
       <Link to="/" className="logo">
         <span className="navbar-plane">✈</span>
-        <span>Travel <strong>Storyboard</strong></span>
+        <span>
+          Travel <strong>Storyboard</strong>
+        </span>
       </Link>
 
       <div className="navbar-center">
-        <span className="navbar-tagline">
-          EXPLORE YOUR WORLD
-        </span>
+        <span className="navbar-tagline">EXPLORE YOUR WORLD</span>
       </div>
 
       <div className="nav-right premium-nav-right">
@@ -49,13 +49,12 @@ const Navbar = () => {
               <span className="nav-user-avatar">
                 <UserRound size={19} />
               </span>
-              <span className="nav-user-name">
-                {user.name}
-              </span>
+              <span className="nav-user-name">{user.name}</span>
             </div>
 
             <button
               className="premium-logout-btn"
+              type="button"
               onClick={handleLogout}
             >
               Logout

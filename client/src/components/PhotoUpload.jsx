@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { uploadMedia } from "../services/mediaService";
 import { Camera, CalendarDays, MapPin, Upload } from "lucide-react";
 

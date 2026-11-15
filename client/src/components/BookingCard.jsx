@@ -1,3 +1,4 @@
+
 import { Plane, Train, Bus, Hotel, Trash2 } from "lucide-react";
 
 const BookingCard = ({ booking, onDelete, onEdit }) => {
@@ -11,7 +12,7 @@ const BookingCard = ({ booking, onDelete, onEdit }) => {
   return (
     <div className="booking-card">
       <div className="booking-icon">
-        {icons[booking.bookingType]}
+        {icons[booking.bookingType] || <Plane size={20} />}
       </div>
 
       <div className="booking-info">
@@ -34,11 +35,17 @@ const BookingCard = ({ booking, onDelete, onEdit }) => {
       </div>
 
       <div className="booking-actions">
-        <button onClick={() => onEdit(booking)}>
+        <button
+          type="button"
+          onClick={() => onEdit(booking)}
+        >
           Edit
         </button>
 
-        <button onClick={() => onDelete(booking._id)}>
+        <button
+          type="button"
+          onClick={() => onDelete(booking)}
+        >
           <Trash2 size={15} />
           Delete
         </button>

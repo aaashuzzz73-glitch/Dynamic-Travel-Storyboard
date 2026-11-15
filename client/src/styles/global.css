@@ -3154,3 +3154,332 @@ button {
     transform: translateY(0);
   }
 }
+
+
+/* SHARED TRAVEL STORY */
+
+.shared-trip-page {
+  min-height: 100vh;
+  background: #102d25;
+  color: #f4f2e9;
+  font-family: inherit;
+  padding-bottom: 45px;
+}
+
+.shared-hero {
+  min-height: 340px;
+  padding: 75px 8%;
+  background: linear-gradient(120deg, #102d25, #234b3d);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+}
+
+.shared-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.shared-eyebrow {
+  color: #ffa45e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+}
+
+.shared-hero h1 {
+  color: #fff;
+  font-size: clamp(35px, 5vw, 58px);
+  margin: 18px 0;
+  line-height: 1.15;
+}
+
+.shared-destination,
+.shared-date {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #d4e0d7;
+  margin-top: 14px;
+  font-size: 15px;
+}
+
+.shared-destination svg,
+.shared-date svg {
+  color: #ffa45e;
+}
+
+.shared-hero-decoration {
+  color: rgba(255,255,255,.12);
+  margin-right: 5%;
+}
+
+.shared-content {
+  max-width: 1200px;
+  margin: auto;
+  padding: 55px 25px;
+}
+
+.shared-section-heading {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.shared-section-heading > span {
+  color: #ffa45e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.shared-section-heading h2 {
+  color: #fff;
+  font-size: 32px;
+  margin: 12px 0;
+}
+
+.shared-section-heading p {
+  color: #b9c9bf;
+  font-size: 14px;
+}
+
+.shared-timeline-wrapper {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 22px;
+  padding: 25px;
+  overflow: hidden;
+}
+
+.shared-footer {
+  text-align: center;
+  margin-top: 55px;
+  color: #d4e0d7;
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.shared-footer span {
+  color: #ffa45e;
+}
+
+.shared-status {
+  min-height: 100vh;
+  background: #102d25;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 25px;
+}
+
+.shared-status h2 {
+  margin: 18px 0 8px;
+}
+
+.shared-status p {
+  color: #bdcec3;
+}
+
+.shared-loader {
+  color: #ffa45e;
+  animation: shared-spin 1.5s linear infinite;
+}
+
+@keyframes shared-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .shared-hero {
+    min-height: 280px;
+    padding: 55px 24px;
+  }
+
+  .shared-hero-decoration {
+    display: none;
+  }
+
+  .shared-content {
+    padding: 35px 14px;
+  }
+
+  .shared-timeline-wrapper {
+    padding: 12px;
+  }
+
+  .shared-section-heading h2 {
+    font-size: 26px;
+  }
+}
+/* MOBILE DASHBOARD FIX */
+@media (max-width: 768px) {
+  .travel-dashboard .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .travel-dashboard .sidebar {
+    width: 100%;
+    padding: 12px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .travel-dashboard .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .travel-dashboard .sidebar a {
+    margin: 0;
+    padding: 10px 12px;
+  }
+
+  .travel-dashboard .dashboard-content {
+    width: 100%;
+    padding: 15px;
+  }
+}
+
+/* MOBILE NAVBAR & SIDEBAR POLISH */
+@media (max-width: 600px) {
+  .travel-dashboard .premium-navbar {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .travel-dashboard .premium-navbar .logo {
+    white-space: nowrap;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .navbar-plane {
+    font-size: 21px;
+  }
+
+  .premium-nav-right {
+    gap: 8px;
+  }
+
+  .premium-logout-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .travel-dashboard .sidebar nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .travel-dashboard .sidebar a {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+/* BOOKINGS MOBILE RESPONSIVE */
+@media (max-width: 600px) {
+  .booking-list {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .booking-list > div,
+  .booking-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .booking-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .booking-info {
+    flex: 1 1 120px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .booking-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+
+/* TRAVEL TIMELINE - MOBILE RESPONSIVE FIX */
+@media (max-width: 650px) {
+  .trip-details-page,
+  .premium-trip-details,
+  .details-section {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .trip-details-page {
+    padding: 12px !important;
+  }
+
+  .premium-trip-details {
+    gap: 18px;
+  }
+
+  .details-section {
+    padding: 14px !important;
+    overflow: hidden;
+  }
+
+  .timeline {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .timeline-day {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 16px !important;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+  }
+
+  .timeline-item {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    padding: 12px !important;
+    box-sizing: border-box;
+  }
+
+  .timeline-item img {
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+}

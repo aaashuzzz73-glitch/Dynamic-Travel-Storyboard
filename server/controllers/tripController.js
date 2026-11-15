@@ -1,7 +1,8 @@
+
 const Booking = require("../models/Booking");
 const Activity = require("../models/Activity");
 const Note = require("../models/Note");
-const Media = require("../models/Media");
+const Media = require("../models/media");
 const Trip = require("../models/Trip");
 const crypto = require("crypto");
 
@@ -145,8 +146,17 @@ exports.getSharedTrip = async (req, res) => {
       Booking.find({ trip: trip._id }).sort({ bookingDate: 1 }),
       Activity.find({ trip: trip._id }).sort({ date: 1 }),
       Note.find({ trip: trip._id }).sort({ date: 1 }),
-      Media.find({ trip: trip._id }).sort({ createdAt: 1 })
+      Media.find({ trip: trip._id }).sort({ date: 1 })
     ]);
+
+    // Debug: Check how many items are fetched
+    console.log("SHARED TRIP DATA:", {
+      trip: trip._id,
+      bookings: bookings.length,
+      activities: activities.length,
+      notes: notes.length,
+      media: media.length
+    });
 
     res.status(200).json({
       trip,
@@ -157,6 +167,7 @@ exports.getSharedTrip = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Get shared trip error:", error);
     res.status(500).json({
       message: error.message
     });
