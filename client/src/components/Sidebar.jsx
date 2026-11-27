@@ -1,3 +1,4 @@
+
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
@@ -6,7 +7,13 @@ const Sidebar = () => {
       <h3>Menu</h3>
 
       <nav>
-        <NavLink to="/">Dashboard</NavLink>
+        <NavLink to="/dashboard" end>
+          Dashboard
+        </NavLink>
+
+        <NavLink to="/explore-trips">
+          Explore Trips
+        </NavLink>
 
         <NavLink to="/create-trip">
           Create Trip

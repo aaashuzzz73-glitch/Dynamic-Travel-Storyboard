@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getAllTrips } from "../services/tripService";
+import { getAllTrips } from "../services/tripservice";
 import {
   getBookings,
   createBooking,
@@ -12,6 +12,7 @@ import {
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import BookingCard from "../components/BookingCard";
+import ConfirmModal from "../components/ConfirmModal";
 
 const initialForm = {
   tripId: "",
@@ -33,6 +34,9 @@ const Bookings = () => {
   const [editingBooking, setEditingBooking] = useState(null);
 
   const [form, setForm] = useState(initialForm);
+
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchBookings = async () => {
     try {
@@ -142,27 +146,39 @@ const Bookings = () => {
     }
   };
 
-  // DELETE BOOKING
-  const handleDelete = async (booking) => {
-    if (!window.confirm("Are you sure you want to delete this booking?")) {
-      return;
-    }
+  // OPEN DELETE CONFIRMATION
+  const handleDelete = (booking) => {
+    setPendingDelete(booking);
+  };
+
+  // CONFIRM DELETE
+  const confirmDelete = async () => {
+    if (!pendingDelete || deleting) return;
 
     try {
+      setDeleting(true);
       setError("");
 
-      await deleteBooking(booking.tripId, booking._id);
-
-      setBookings((prev) =>
-        prev.filter((item) => item._id !== booking._id)
+      await deleteBooking(
+        pendingDelete.tripId,
+        pendingDelete._id
       );
 
-      if (editingBooking?._id === booking._id) {
+      setBookings((prev) =>
+        prev.filter((item) => item._id !== pendingDelete._id)
+      );
+
+      if (editingBooking?._id === pendingDelete._id) {
         handleCancelEdit();
       }
+
+      setPendingDelete(null);
     } catch (err) {
       console.error(err);
       setError("Unable to delete booking.");
+      setPendingDelete(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -173,7 +189,7 @@ const Bookings = () => {
       <div className="dashboard-layout">
         <Sidebar />
 
-        <main className="dashboard-content">
+        <main className="dashboard-content bookings-page">
           <h1>My Bookings</h1>
           <p>Manage all your travel reservations in one place.</p>
 
@@ -333,6 +349,22 @@ const Bookings = () => {
           </section>
         </main>
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(pendingDelete)}
+        title="Delete Booking?"
+        message={
+          pendingDelete
+            ? `Are you sure you want to delete "${pendingDelete.title}"? This action cannot be undone.`
+            : ""
+        }
+        confirmText={deleting ? "Deleting..." : "Yes, Delete"}
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          if (!deleting) setPendingDelete(null);
+        }}
+      />
     </div>
   );
 };

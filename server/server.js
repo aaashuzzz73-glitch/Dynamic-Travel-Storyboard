@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 const tripRoutes = require("./routes/tripRoutes");
 const authRoutes = require("./routes/authRoutes");
 const publicRoutes = require("./routes/publicRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 const app = express();
 
@@ -28,6 +29,9 @@ app.use("/api/auth", authRoutes);
 
 // Public sharing routes
 app.use("/api/public", publicRoutes);
+
+// Contact form routes
+app.use("/api/contact", contactRoutes);
 
 // All trip-related routes
 // Includes trips, bookings, activities, notes and media

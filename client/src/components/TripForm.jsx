@@ -37,7 +37,6 @@ const TripForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="trip-form premium-trip-form">
-
       <div className="form-group">
         <label>
           <Plane size={16} /> Trip Name

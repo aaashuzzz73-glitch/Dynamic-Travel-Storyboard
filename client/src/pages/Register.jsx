@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -31,7 +32,12 @@ const Register = () => {
 
     try {
       await register(formData);
-      navigate("/");
+
+      if (location.state?.destination) {
+        navigate("/create-trip", { state: location.state });
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed.");
     } finally {
@@ -112,7 +118,8 @@ const Register = () => {
           </button>
 
           <p className="auth-switch">
-            Already have an account? <Link to="/login">Login</Link>
+            Already have an account?{" "}
+            <Link to="/login" state={location.state}>Login</Link>
           </p>
         </form>
       </div>

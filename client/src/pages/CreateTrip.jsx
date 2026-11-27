@@ -1,15 +1,19 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Plane, MapPin, Sparkles } from "lucide-react";
 
-import { createTrip } from "../services/tripService";
+import { createTrip } from "../services/tripservice";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import TripForm from "../components/TripForm";
 
 const CreateTrip = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const selectedDestination = location.state?.destination || "";
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +23,7 @@ const CreateTrip = () => {
       setLoading(true);
 
       await createTrip(tripData);
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError(
         err.response?.data?.message || "Failed to create trip."
@@ -37,7 +41,6 @@ const CreateTrip = () => {
         <Sidebar />
 
         <main className="dashboard-content create-trip-page">
-
           <section className="create-trip-hero">
             <div>
               <span className="eyebrow">
@@ -76,13 +79,20 @@ const CreateTrip = () => {
             <TripForm
               onSubmit={handleCreateTrip}
               loading={loading}
+              initialData={{
+                tripName: selectedDestination
+                  ? `Trip to ${selectedDestination}`
+                  : "",
+                destinations: selectedDestination
+                  ? [selectedDestination]
+                  : [],
+              }}
             />
           </section>
 
           <footer className="travel-footer">
             Made for your journeys and memories ✨
           </footer>
-
         </main>
       </div>
     </div>

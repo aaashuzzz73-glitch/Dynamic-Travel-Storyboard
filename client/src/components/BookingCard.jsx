@@ -3,16 +3,16 @@ import { Plane, Train, Bus, Hotel, Trash2 } from "lucide-react";
 
 const BookingCard = ({ booking, onDelete, onEdit }) => {
   const icons = {
-    Flight: <Plane size={20} />,
-    Train: <Train size={20} />,
-    Bus: <Bus size={20} />,
-    Hotel: <Hotel size={20} />,
+    Flight: <Plane size={22} />,
+    Train: <Train size={22} />,
+    Bus: <Bus size={22} />,
+    Hotel: <Hotel size={22} />,
   };
 
   return (
     <div className="booking-card">
       <div className="booking-icon">
-        {icons[booking.bookingType] || <Plane size={20} />}
+        {icons[booking.bookingType] || <Plane size={22} />}
       </div>
 
       <div className="booking-info">
@@ -30,22 +30,18 @@ const BookingCard = ({ booking, onDelete, onEdit }) => {
         </small>
 
         {booking.bookingReference && (
-          <p>Reference: {booking.bookingReference}</p>
+          <p className="booking-reference">
+            Reference: {booking.bookingReference}
+          </p>
         )}
       </div>
 
       <div className="booking-actions">
-        <button
-          type="button"
-          onClick={() => onEdit(booking)}
-        >
+        <button type="button" onClick={() => onEdit(booking)}>
           Edit
         </button>
 
-        <button
-          type="button"
-          onClick={() => onDelete(booking)}
-        >
+        <button type="button" onClick={() => onDelete(booking)}>
           <Trash2 size={15} />
           Delete
         </button>

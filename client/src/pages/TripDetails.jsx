@@ -13,25 +13,28 @@ import {
   Clock,
   Plus,
   Sparkles,
+  Pencil,
+  X,
 } from "lucide-react";
 
 import {
   getTripById,
   updateTripSharing,
-} from "../services/tripService";
+} from "../services/tripservice";
 
 import { getBookings } from "../services/bookingservice";
 import { getNotes } from "../services/noteservice";
 import {
   getMedia,
   deleteMedia,
-} from "../services/mediaService";
+} from "../services/mediaservice";
 
 import {
   getActivities,
   createActivity,
+  updateActivity,
   deleteActivity,
-} from "../services/activityService";
+} from "../services/activityservice";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -39,6 +42,16 @@ import Timeline from "../components/Timeline";
 import WeatherCard from "../components/WeatherCard";
 import PhotoGallery from "../components/PhotoGallery";
 import PhotoUpload from "../components/PhotoUpload";
+import ConfirmModal from "../components/ConfirmModal";
+
+const initialActivityForm = {
+  title: "",
+  description: "",
+  date: "",
+  time: "",
+  location: "",
+  category: "Other",
+};
 
 const TripDetails = () => {
   const { tripId } = useParams();
@@ -55,15 +68,10 @@ const TripDetails = () => {
   const [shareLink, setShareLink] = useState("");
   const [sharing, setSharing] = useState(false);
   const [addingActivity, setAddingActivity] = useState(false);
-
-  const [activityForm, setActivityForm] = useState({
-    title: "",
-    description: "",
-    date: "",
-    time: "",
-    location: "",
-    category: "Other",
-  });
+  const [editingActivityId, setEditingActivityId] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [activityForm, setActivityForm] = useState(initialActivityForm);
 
   useEffect(() => {
     const fetchTripDetails = async () => {
@@ -127,70 +135,135 @@ const TripDetails = () => {
     });
   };
 
+  const resetActivityForm = () => {
+    setActivityForm(initialActivityForm);
+    setEditingActivityId(null);
+  };
+
+  const handleEditActivity = (activity) => {
+    setEditingActivityId(activity._id);
+
+    setActivityForm({
+      title: activity.title || "",
+      description: activity.description || "",
+      date: activity.date ? String(activity.date).slice(0, 10) : "",
+      time: activity.time || "",
+      location: activity.location || "",
+      category: activity.category || "Other",
+    });
+
+    document
+      .getElementById("activity-planner-form")
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   const handleAddActivity = async (e) => {
     e.preventDefault();
 
     try {
       setAddingActivity(true);
 
-      const response = await createActivity(tripId, activityForm);
-      const newActivity = response.activity || response;
+      if (editingActivityId) {
+        const response = await updateActivity(
+          tripId,
+          editingActivityId,
+          activityForm
+        );
 
-      setActivities((prev) => [...prev, newActivity]);
+        const updatedActivity = response.activity || response;
 
-      setActivityForm({
-        title: "",
-        description: "",
-        date: "",
-        time: "",
-        location: "",
-        category: "Other",
-      });
+        setActivities((prev) =>
+          prev.map((item) =>
+            item._id === editingActivityId
+              ? updatedActivity
+              : item
+          )
+        );
 
-      alert("Activity added successfully!");
+        alert("Activity updated successfully!");
+      } else {
+        const response = await createActivity(tripId, activityForm);
+        const newActivity = response.activity || response;
+
+        setActivities((prev) => [...prev, newActivity]);
+
+        alert("Activity added successfully!");
+      }
+
+      resetActivityForm();
     } catch (err) {
-      alert("Unable to add activity.");
+      alert(
+        err.response?.data?.message ||
+          (editingActivityId
+            ? "Unable to update activity."
+            : "Unable to add activity.")
+      );
     } finally {
       setAddingActivity(false);
     }
   };
 
-  const handleDeleteActivity = async (activityId) => {
-    if (!window.confirm("Delete this activity?")) return;
+  const handleDeleteActivity = (activityId) => {
+    setPendingDelete({
+      type: "activity",
+      id: activityId,
+    });
+  };
+
+  // DELETE PHOTO
+  const handleDeleteMedia = (mediaId) => {
+    setPendingDelete({
+      type: "photo",
+      id: mediaId,
+    });
+  };
+
+  // CONFIRM DELETE
+  const confirmDelete = async () => {
+    if (!pendingDelete || deleting) return;
 
     try {
-      await deleteActivity(tripId, activityId);
+      setDeleting(true);
+      setError("");
 
-      setActivities((prev) =>
-        prev.filter((item) => item._id !== activityId)
-      );
+      if (pendingDelete.type === "activity") {
+        await deleteActivity(tripId, pendingDelete.id);
+
+        setActivities((prev) =>
+          prev.filter((item) => item._id !== pendingDelete.id)
+        );
+
+        if (editingActivityId === pendingDelete.id) {
+          resetActivityForm();
+        }
+      } else {
+        await deleteMedia(tripId, pendingDelete.id);
+
+        setMedia((prev) =>
+          prev.filter((item) => item._id !== pendingDelete.id)
+        );
+
+        setSuccessMessage("Photo deleted successfully!");
+
+        setTimeout(() => {
+          setSuccessMessage("");
+        }, 3000);
+      }
+
+      setPendingDelete(null);
     } catch (err) {
-      alert("Unable to delete activity.");
+      console.error("Delete error:", err);
+      setError(
+        pendingDelete.type === "activity"
+          ? "Unable to delete activity."
+          : "Unable to delete photo."
+      );
+      setPendingDelete(null);
+    } finally {
+      setDeleting(false);
     }
   };
-// DELETE PHOTO
-const handleDeleteMedia = async (mediaId) => {
-  if (!window.confirm("Delete this photo?")) return;
 
-  try {
-    await deleteMedia(tripId, mediaId);
-
-    setMedia((prev) =>
-      prev.filter((item) => item._id !== mediaId)
-    );
-
-    setError("");
-    setSuccessMessage("Photo deleted successfully!");
-
-    setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
-
-  } catch (err) {
-    console.error("Delete photo error:", err);
-    setError("Unable to delete photo.");
-  }
-};
   if (loading) {
     return (
       <div className="app-layout travel-dashboard">
@@ -219,7 +292,7 @@ const handleDeleteMedia = async (mediaId) => {
             <p className="error-message">
               {error || "Trip not found."}
             </p>
-            <Link to="/">Back to Dashboard</Link>
+            <Link to="/dashboard">Back to Dashboard</Link>
           </main>
         </div>
       </div>
@@ -331,6 +404,7 @@ const handleDeleteMedia = async (mediaId) => {
             </div>
 
             <form
+              id="activity-planner-form"
               className="trip-form premium-trip-form"
               onSubmit={handleAddActivity}
             >
@@ -410,9 +484,32 @@ const handleDeleteMedia = async (mediaId) => {
                 className="travel-create-btn"
                 disabled={addingActivity}
               >
-                <Plus size={17} />
-                {addingActivity ? "Adding..." : "Add Activity"}
+                {editingActivityId ? (
+                  <Pencil size={17} />
+                ) : (
+                  <Plus size={17} />
+                )}
+
+                {addingActivity
+                  ? editingActivityId
+                    ? "Updating..."
+                    : "Adding..."
+                  : editingActivityId
+                    ? "Update Activity"
+                    : "Add Activity"}
               </button>
+
+              {editingActivityId && (
+                <button
+                  type="button"
+                  className="travel-create-btn"
+                  onClick={resetActivityForm}
+                  disabled={addingActivity}
+                >
+                  <X size={17} />
+                  Cancel Edit
+                </button>
+              )}
             </form>
 
             <div className="planned-activities">
@@ -432,16 +529,30 @@ const handleDeleteMedia = async (mediaId) => {
                     >
                       <div className="activity-item-top">
                         <span>{activity.category}</span>
-                        <button
-                          type="button"
-                          className="activity-delete-btn"
-                          onClick={() =>
-                            handleDeleteActivity(activity._id)
-                          }
-                          aria-label="Delete activity"
-                        >
-                          <Trash2 size={17} />
-                        </button>
+
+                        <div>
+                          <button
+                            type="button"
+                            className="activity-delete-btn"
+                            onClick={() => handleEditActivity(activity)}
+                            aria-label="Edit activity"
+                            title="Edit activity"
+                          >
+                            <Pencil size={17} />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="activity-delete-btn"
+                            onClick={() =>
+                              handleDeleteActivity(activity._id)
+                            }
+                            aria-label="Delete activity"
+                            title="Delete activity"
+                          >
+                            <Trash2 size={17} />
+                          </button>
+                        </div>
                       </div>
 
                       <h3>{activity.title}</h3>
@@ -524,31 +635,50 @@ const handleDeleteMedia = async (mediaId) => {
               }}
             />
 
-                   {/* SUCCESS MESSAGE */}
-          {successMessage && (
-            <div className="success-message">
-              <span>✓</span>
-              {successMessage}
-            </div>
-          )}
+            {/* SUCCESS MESSAGE */}
+            {successMessage && (
+              <div className="success-message">
+                <span>✓</span>
+                {successMessage}
+              </div>
+            )}
 
-          {/* PHOTO GALLERY */}
-          <PhotoGallery
-            media={media}
-            onDelete={handleDeleteMedia}
-          />
+            {/* PHOTO GALLERY */}
+            <PhotoGallery
+              media={media}
+              onDelete={handleDeleteMedia}
+            />
+          </section>
 
-        </section>
+          {/* FOOTER */}
+          <footer className="travel-footer">
+            Every journey becomes a beautiful memory ✨
+          </footer>
 
-        {/* FOOTER */}
-        <footer className="travel-footer">
-          Every journey becomes a beautiful memory ✨
-        </footer>
+        </main>
+      </div>
 
-      </main>
+      <ConfirmModal
+        isOpen={Boolean(pendingDelete)}
+        title={
+          pendingDelete?.type === "activity"
+            ? "Delete Activity?"
+            : "Delete Photo?"
+        }
+        message={
+          pendingDelete?.type === "activity"
+            ? "Are you sure you want to delete this activity?"
+            : "Are you sure you want to delete this photo?"
+        }
+        confirmText={deleting ? "Deleting..." : "Yes, Delete"}
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          if (!deleting) setPendingDelete(null);
+        }}
+      />
     </div>
-  </div>
-);
+  );
 };
 
 export default TripDetails;

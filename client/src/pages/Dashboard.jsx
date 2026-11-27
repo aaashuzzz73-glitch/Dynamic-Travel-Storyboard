@@ -1,17 +1,16 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   getAllTrips,
   deleteTrip,
-} from "../services/tripService";
+} from "../services/tripservice";
 import { getBookings } from "../services/bookingservice";
 
 import TripCard from "../components/TripCard";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import WeatherCard from "../components/WeatherCard";
-
+import ConfirmModal from "../components/ConfirmModal";
 import {
   Plane,
   Train,
@@ -33,7 +32,8 @@ const Dashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+const [pendingDelete, setPendingDelete] = useState(null);
+const [deleting, setDeleting] = useState(false);
   const fetchDashboard = async () => {
     try {
       setLoading(true);
@@ -88,23 +88,43 @@ const Dashboard = () => {
     fetchDashboard();
   }, []);
 
-  const handleDelete = async (tripId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this trip?"
+ const handleDelete = (tripId) => {
+  const selectedTrip = trips.find(
+    (trip) => trip._id === tripId
+  );
+
+  if (selectedTrip) {
+    setPendingDelete(selectedTrip);
+  }
+};
+
+const confirmDelete = async () => {
+  if (!pendingDelete || deleting) return;
+
+  try {
+    setDeleting(true);
+    setError("");
+
+    await deleteTrip(pendingDelete._id);
+
+    setTrips((prev) =>
+      prev.filter((trip) => trip._id !== pendingDelete._id)
     );
 
-    if (!confirmDelete) return;
+    setBookings((prev) =>
+      prev.filter((booking) => booking.tripId !== pendingDelete._id)
+    );
 
-    try {
-      await deleteTrip(tripId);
-      setTrips((prev) =>
-        prev.filter((trip) => trip._id !== tripId)
-      );
-      fetchDashboard();
-    } catch (err) {
-      setError("Failed to delete trip.");
-    }
-  };
+    setPendingDelete(null);
+    await fetchDashboard();
+  } catch (err) {
+    console.error("Delete trip error:", err);
+    setError("Failed to delete trip.");
+    setPendingDelete(null);
+  } finally {
+    setDeleting(false);
+  }
+};
 
   const destination =
     trips[0]?.destinations?.[0] || "";
@@ -117,7 +137,6 @@ const Dashboard = () => {
         <Sidebar />
 
         <main className="dashboard-content premium-dashboard">
-
           <section className="welcome-panel">
             <div className="welcome-text">
               <span className="eyebrow">
@@ -145,35 +164,44 @@ const Dashboard = () => {
             </div>
           </section>
 
+          {/* DASHBOARD SUMMARY CARDS */}
           <section className="travel-stats">
-            <div className="stat-card">
+            <a
+              href="#my-trips"
+              className="stat-card stat-card-link"
+            >
               <span className="stat-icon">✈️</span>
-              <div>
+              <div className="stat-content">
                 <h2>{trips.length}</h2>
                 <p>Total Trips</p>
               </div>
-            </div>
+            </a>
 
-            <div className="stat-card">
+            <Link
+              to="/bookings"
+              className="stat-card stat-card-link"
+            >
               <span className="stat-icon">🌍</span>
-              <div>
+              <div className="stat-content">
                 <h2>{bookings.length}</h2>
                 <p>Upcoming Bookings</p>
               </div>
-            </div>
+            </Link>
 
-            <div className="stat-card">
+            <Link
+              to="/journal"
+              className="stat-card stat-card-link"
+            >
               <span className="stat-icon">📸</span>
-              <div>
+              <div className="stat-content">
                 <h2>Memories</h2>
                 <p>Your travel stories</p>
               </div>
-            </div>
+            </Link>
           </section>
 
           {/* WEATHER AND BOOKINGS */}
           <section className="dashboard-widgets">
-
             <div className="dashboard-widget">
               <div className="widget-heading">
                 <div>
@@ -246,10 +274,9 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-
           </section>
 
-          <section className="my-trips-section">
+          <section className="my-trips-section" id="my-trips">
             <div className="trips-section-header">
               <div>
                 <span className="eyebrow">YOUR COLLECTION</span>
@@ -303,9 +330,23 @@ const Dashboard = () => {
           <footer className="travel-footer">
             Made for your journeys and memories ✨
           </footer>
-
         </main>
       </div>
+            <ConfirmModal
+        isOpen={Boolean(pendingDelete)}
+        title="Delete Trip?"
+        message={
+          pendingDelete
+            ? `Are you sure you want to delete "${pendingDelete.tripName}"? This action cannot be undone.`
+            : ""
+        }
+        confirmText={deleting ? "Deleting..." : "Yes, Delete"}
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          if (!deleting) setPendingDelete(null);
+        }}
+      />
     </div>
   );
 };

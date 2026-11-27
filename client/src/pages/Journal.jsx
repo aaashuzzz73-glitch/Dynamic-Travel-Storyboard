@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getAllTrips } from "../services/tripService";
+import { getAllTrips } from "../services/tripservice";
 import {
   getNotes,
   createNote,
@@ -12,6 +12,7 @@ import {
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import JournalCard from "../components/JournalCard";
+import ConfirmModal from "../components/ConfirmModal";
 
 const emptyForm = {
   tripId: "",
@@ -27,7 +28,8 @@ const Journal = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [editingNote, setEditingNote] = useState(null);
-
+const [pendingDelete, setPendingDelete] = useState(null);
+const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
   // FETCH TRIPS AND JOURNAL ENTRIES
@@ -163,25 +165,39 @@ const Journal = () => {
   };
 
   // DELETE JOURNAL ENTRY
-  const handleDelete = async (note) => {
-    if (!window.confirm("Delete this journal entry?")) return;
+ 
+// DELETE JOURNAL ENTRY
+const handleDelete = (note) => {
+  setPendingDelete(note);
+};
 
-    try {
-      await deleteNote(note.tripId, note._id);
+// CONFIRM DELETE
+const confirmDelete = async () => {
+  if (!pendingDelete || deleting) return;
 
-      setNotes((prev) =>
-        prev.filter((item) => item._id !== note._id)
-      );
+  try {
+    setDeleting(true);
+    setError("");
 
-      if (editingNote?._id === note._id) {
-        handleCancelEdit();
-      }
-    } catch (err) {
-      console.error("Delete journal error:", err);
-      setError("Unable to delete journal entry.");
+    await deleteNote(pendingDelete.tripId, pendingDelete._id);
+
+    setNotes((prev) =>
+      prev.filter((item) => item._id !== pendingDelete._id)
+    );
+
+    if (editingNote?._id === pendingDelete._id) {
+      handleCancelEdit();
     }
-  };
 
+    setPendingDelete(null);
+  } catch (err) {
+    console.error("Delete journal error:", err);
+    setError("Unable to delete journal entry.");
+    setPendingDelete(null);
+  } finally {
+    setDeleting(false);
+  }
+};
   return (
     <div className="app-layout travel-dashboard journal-page">
       <Navbar />
@@ -376,6 +392,21 @@ const Journal = () => {
 
         </main>
       </div>
+      <ConfirmModal
+  isOpen={Boolean(pendingDelete)}
+  title="Delete Memory?"
+  message={
+    pendingDelete
+      ? `Are you sure you want to delete "${pendingDelete.title}"?`
+      : ""
+  }
+  confirmText={deleting ? "Deleting..." : "Yes, Delete"}
+  cancelText="Cancel"
+  onConfirm={confirmDelete}
+  onCancel={() => {
+    if (!deleting) setPendingDelete(null);
+  }}
+/>
     </div>
   );
 };

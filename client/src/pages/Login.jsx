@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -30,7 +31,14 @@ const Login = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate("/");
+
+      if (location.state?.destination) {
+        navigate("/create-trip", {
+          state: location.state,
+        });
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");
     } finally {
@@ -50,7 +58,9 @@ const Login = () => {
             for you. Log in and continue exploring.
           </p>
         </div>
-        <span className="auth-footer">Explore. Experience. Remember.</span>
+        <span className="auth-footer">
+          Explore. Experience. Remember.
+        </span>
       </div>
 
       <div className="auth-content">
@@ -85,6 +95,7 @@ const Login = () => {
               onChange={handleChange}
               required
             />
+
             <button
               type="button"
               className="password-toggle"
@@ -94,7 +105,11 @@ const Login = () => {
             </button>
           </div>
 
-          <button className="auth-submit" type="submit" disabled={loading}>
+          <button
+            className="auth-submit"
+            type="submit"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login →"}
           </button>
 

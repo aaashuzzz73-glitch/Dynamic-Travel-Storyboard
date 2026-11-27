@@ -1,9 +1,12 @@
+
 import { createContext, useState, useEffect } from "react";
+
 import {
   getCurrentUser,
   loginUser,
   registerUser,
-} from "../services/authService";
+  updateUserProfile,
+} from "../services/authservice";
 
 export const AuthContext = createContext();
 
@@ -16,10 +19,14 @@ export const AuthProvider = ({ children }) => {
 
     if (token) {
       getCurrentUser()
-        .then((data) => setUser(data.user))
+        .then((data) => {
+          setUser(data.user);
+          localStorage.setItem("dts_user", JSON.stringify(data.user));
+        })
         .catch(() => {
           localStorage.removeItem("dts_token");
           localStorage.removeItem("dts_user");
+          setUser(null);
         })
         .finally(() => setLoading(false));
     } else {
@@ -27,13 +34,19 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (userData) => {
-    const data = await loginUser(userData);
+  const login = async (userData, password) => {
+    const credentials =
+      typeof userData === "string"
+        ? { email: userData, password }
+        : userData;
+
+    const data = await loginUser(credentials);
 
     localStorage.setItem("dts_token", data.token);
     localStorage.setItem("dts_user", JSON.stringify(data.user));
 
     setUser(data.user);
+
     return data;
   };
 
@@ -44,6 +57,16 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("dts_user", JSON.stringify(data.user));
 
     setUser(data.user);
+
+    return data;
+  };
+
+  const updateProfile = async (profileData) => {
+    const data = await updateUserProfile(profileData);
+
+    localStorage.setItem("dts_user", JSON.stringify(data.user));
+    setUser(data.user);
+
     return data;
   };
 
@@ -55,7 +78,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout }}
+      value={{ user, loading, login, register, updateProfile, logout }}
     >
       {children}
     </AuthContext.Provider>

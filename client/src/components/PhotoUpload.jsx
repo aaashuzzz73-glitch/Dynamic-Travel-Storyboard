@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { uploadMedia } from "../services/mediaService";
+import { uploadMedia } from "../services/mediaservice";
 import { Camera, CalendarDays, MapPin, Upload } from "lucide-react";
 
 const PhotoUpload = ({ tripId, activities = [], onUpload }) => {
